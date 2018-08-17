@@ -1,13 +1,11 @@
 env:
   global:
   - TERM=dumb
-
+  - secure: ppU05jJH6S0nNp/rmj2/79vMqvYA/ENEjxvV9fsOwuqm8GPOXgv9dhyZRfcc4TNrMrXYgp9CO4Sjwf4bLwMzR7mmJnVRRnUGmmAbpjjAAa+Nl1zZl/z0X4ZiffTdvHfheAeFAvqaHJardw7T6OsuwEOCd4kBWFo2q7KwCgHbxnWPvkqJQraOQCuGFkZP+rbOI04ALlRB9BLitAbfvJNk6GkNoHejn58Sgks4B7Ke+I0frsoXx7ipKwD/+RsqTAXuGl78ga6t8aeVpeA43mQCBz5m+V+p6qAgs+E5U+lEEDqhemqyyQOkNz3uUw1cZojpESmScYnAFR7CMqEMydm21XPt4sz02qQ6n8sZAFJvA7oTTx1CvfTy67TSKHyhwx3BfKXOrCPrLN7FJtVLq+jBe5Bwpb8YmxImNSnIRwtP9Mmavr/yRcWgtlKwKxqCjr9nN7J8XX8DjPymvAzVU1azcOIgitSDv+WZ7GsLnTYEkPGpUgexzJ/K4Dll+XLsrQT5lmiJg7rgA74+0HDpy5Ji+09LLuWnfpmHcjbc2q5lWXncsamYdUUcOxVq3pSBCUMziQ9rXhEBDn2QAW30Vktxbs6Tf5fi030HiklQ77xzBKLR90ESxBzht6gvJLjqI4hS/+6f4tErJ6d1WMY2vBzglf7xFThKCWSRWSiC1r1Cb7k=
 language: java
 jdk: oraclejdk10
-
 service:
 - docker
-
 addons:
   apt:
     update: true
@@ -19,7 +17,6 @@ addons:
     - libxml2-utils
     - docker-ce
     - google-chrome-stable
-
 install: true
 before_install:
 - nvm install lts/*
@@ -30,39 +27,30 @@ before_install:
 - stop_any 8080 80
 - sudo add-apt-repository universe -y
 - sudo apt-get update -yqq
-- sudo apt-get install -yqq --no-install-suggests --no-install-recommends tree jq python-pip
+- sudo apt-get install -yqq --no-install-suggests --no-install-recommends tree jq
+  python-pip
 - sudo pip install docker-compose httpie >/dev/null 2>&1
-
 script:
 - export root=$(pwd)
 - bash mvnw
-- bash gradlew
-
 before_deploy:
 - cd ${root}
-#- ./gradlew documentation
-- ./mvnw -Pdocs
+- "./mvnw -Pdocs"
 - mkdir -p ./target/generated-docs
 - cp -Rf ./target/generated-docs/index.html ./target/generated-docs/404.html
-
 deploy:
   provider: pages
   skip-cleanup: true
-  # travis encrypt GITHUB_TOKEN=<your github repo token> --add
   github-token: "$GITHUB_TOKEN"
   keep-history: true
   on:
     branch: master
   local-dir: target/generated-docs
   target_branch: gh-pages
-
 before_cache:
-- for item in $(find ~/.gradle -name "*.lock");
-    do sudo rm -rf $item ;
-  done
-
+- for item in $(find ~/.gradle -name "*.lock"); do sudo rm -rf $item ; done
 cache:
   directories:
-  - $HOME/.m2
-  - $HOME/.gradle
-  - $HOME/.docker
+  - "$HOME/.m2"
+  - "$HOME/.gradle"
+  - "$HOME/.docker"
