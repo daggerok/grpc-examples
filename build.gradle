@@ -1,0 +1,74 @@
+//tag::content[]
+buildscript {
+  ext {
+    grpcVersion = '1.14.0'
+    protocVersion = '3.6.1'
+  }
+}
+
+plugins {
+  id 'java'
+  id 'com.google.protobuf' version '0.8.6'
+  //end::content[]
+  id 'io.franzbecker.gradle-lombok' version '1.14'
+  id 'org.springframework.boot' version '2.0.4.RELEASE'
+  id 'io.spring.dependency-management' version '1.0.6.RELEASE'
+  id 'eclipse'
+  id 'idea'
+  //tag::content[]
+}
+//end::content[]
+
+version = '0.0.5'
+group = 'daggerok'
+sourceCompatibility = targetCompatibility = 1.8
+
+lombok.version = '1.18.2'
+
+//tag::content[]
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "io.grpc:grpc-netty:$grpcVersion"
+  compile "io.grpc:grpc-protobuf:$grpcVersion"
+  compile "io.grpc:grpc-stub:$grpcVersion"
+  //end::content[]
+  compile 'org.springframework.boot:spring-boot-starter-webflux'
+  testCompile 'org.springframework.boot:spring-boot-starter-test'
+  testCompile 'io.projectreactor:reactor-test'
+  //tag::content[]
+}
+
+protobuf {
+  protoc {
+    artifact = "com.google.protobuf:protoc:$protocVersion"
+  }
+  plugins {
+    grpc {
+      artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins {
+      grpc {}
+    }
+  }
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs "$buildDir/generated/source/proto/main/grpc"
+      srcDirs "$buildDir/generated/source/proto/main/java"
+    }
+  }
+}
+//end::content[]
+
+wrapper {
+  gradleVersion = '4.9'
+}
+
+defaultTasks 'clean', 'build'
