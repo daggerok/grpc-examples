@@ -26,6 +26,7 @@ sourceCompatibility = targetCompatibility = 1.8
 lombok.version = '1.18.2'
 
 //tag::content[]
+
 repositories {
   mavenCentral()
 }
