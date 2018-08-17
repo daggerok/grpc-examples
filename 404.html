@@ -463,7 +463,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author" class="author">Maksim Kostromin</span><br>
 <span id="email" class="email"><a href="mailto:daggerok@gmail.com">daggerok@gmail.com</a></span><br>
 <span id="revnumber">version 0.0.1,</span>
-<span id="revdate">2018-08-17 20:14:29 UTC</span>
+<span id="revdate">2018-08-17 20:23:17 UTC</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -489,7 +489,51 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="title">gradle</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">include::../</code></pre>
+<pre class="highlightjs highlight"><code class="language-gradle hljs" data-lang="gradle">buildscript {
+  ext {
+    grpcVersion = '1.14.0'
+    protocVersion = '3.6.1'
+  }
+}
+
+plugins {
+  id 'java'
+  id 'com.google.protobuf' version '0.8.6'
+}
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "io.grpc:grpc-netty:$grpcVersion"
+  compile "io.grpc:grpc-protobuf:$grpcVersion"
+  compile "io.grpc:grpc-stub:$grpcVersion"
+}
+
+protobuf {
+  protoc {
+    artifact = "com.google.protobuf:protoc:$protocVersion"
+  }
+  plugins {
+    grpc {
+      artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins {
+      grpc {}
+    }
+  }
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs "$buildDir/generated/source/proto/main/grpc"
+      srcDirs "$buildDir/generated/source/proto/main/java"
+    }
+  }
+}</code></pre>
 </div>
 </div>
 </div>
@@ -524,7 +568,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1<br>
-Last updated 2018-08-17 20:14:29 UTC
+Last updated 2018-08-17 20:23:17 UTC
 </div>
 </div>
 <!-- jquery -->
