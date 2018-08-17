@@ -2,6 +2,8 @@
 
 //tag::content[]
 
+In progress...
+
 Read link:https://daggerok.github.io/grpc-examples[project reference documentation]
 
 Other repositories:

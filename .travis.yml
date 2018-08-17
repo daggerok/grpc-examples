@@ -10,13 +10,14 @@ addons:
   apt:
     update: true
     packages:
-    - libappindicator1
-    - fonts-liberation
     - bash
     - curl
     - libxml2-utils
-    - docker-ce
+    - libappindicator1
+    - fonts-liberation
     - google-chrome-stable
+    - docker-ce
+    - git
 install: true
 before_install:
 - nvm install lts/*
@@ -27,12 +28,33 @@ before_install:
 - stop_any 8080 80
 - sudo add-apt-repository universe -y
 - sudo apt-get update -yqq
-- sudo apt-get install -yqq --no-install-suggests --no-install-recommends tree jq
-  python-pip
+- sudo apt-get install -yqq --no-install-suggests --no-install-recommends
+  tree jq python-pip
 - sudo pip install docker-compose httpie >/dev/null 2>&1
 script:
 - export root=$(pwd)
-- bash mvnw
+#
+- cd /tmp/
+- git clone https://github.com/daggerok/grpc-spring-5
+- cd grpc-spring-5/
+# grpc-spring-5 gradle
+- ./gradlew -b grpc-server/build.gradle
+- ./gradlew -b grpc-client/build.gradle
+- java -jar grpc-server/build/libs/*jar &
+- java -jar grpc-client/build/libs/*jar &
+- wait_for 8000 8080 8081
+- http get :8081 name=Gradle emo=SAD
+- http get :8081 name=Gradle emo=HAPPY
+- stop_any 8000 8080 8081
+# grpc-spring-5 maven
+- ./mvnw -U -f grpc-server/pom.xml
+- ./mvnw -U -f grpc-client/pom.xml
+- java -jar grpc-server/target/*jar &
+- java -jar grpc-client/target/*jar &
+- wait_for 8000 8080 8081
+- http get :8081 name=Maven emo=SAD
+- http get :8081 name=Maven emo=HAPPY
+- stop_any 8000 8080 8081
 before_deploy:
 - cd ${root}
 - "./mvnw -Pdocs"
